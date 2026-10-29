@@ -1,0 +1,6 @@
+# nunca subir muestras ni bancos de escritura
+specimens/
+*.pkl
+*.jpg
+!figures/*.png
+private/
