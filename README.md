@@ -12,12 +12,24 @@ Modern handwriting generators (diffusion- and transformer-based few-shot models)
 
 | Property | Neural few-shot generators | Manualis |
 |---|---|---|
+| Neural networks / AI models | Required (trained generator) | **None** — classical vision and geometry only |
+| Training data | Large multi-writer corpora | One calibration form per writer |
 | Writer fidelity | Learned approximation | Real specimen ink, recombined |
 | Spanish diacritics (á é í ó ú ü ñ ¿ ¡) | Limited | Native |
 | Compute per generation | GPU inference | CPU only, offline |
+| Data privacy | Often cloud-hosted | Specimens never leave the machine |
+| Reproducibility | Sampling-dependent | Seeded: same seed, same output |
 | Output | Raster image | Raster page **and** ordered pen strokes (G-code) |
 
 The working hypothesis is that, for a single writer, a well-curated specimen bank plus deterministic geometric composition is competitive in legibility and superior in cost and reproducibility.
+
+## Design principles
+
+- **No AI dependency.** There is no neural network, no trained model, no cloud API and no GPU anywhere in the pipeline. Every stage is classical: morphological filtering, polynomial fitting, dynamic programming, EM-style template averaging, Bézier geometry and skeletonization. The system keeps working with no internet connection and no third-party service.
+- **One-time cost per writer.** The expensive work (segmentation, alignment, template refinement) runs once per writer. After that, each page is produced in seconds on an ordinary CPU.
+- **Explainable by construction.** Every output glyph traces back to a specific specimen and a specific geometric rule, so every error can be located and corrected at the rule that produced it.
+- **Measured, not claimed.** Each change is accepted only if the legibility metric does not regress.
+- **Simulation before motion.** The preview and the G-code consume exactly the same trajectory, and no motion is executed before the toolpath has passed simulation.
 
 ## Method (summary)
 
@@ -49,6 +61,13 @@ Details: [`docs/METHOD.md`](docs/METHOD.md).
 | Specimen processing, glyph bank, synthesis, page layout | Implemented |
 | Stroke extraction and G-code generation | Implemented, **validated in simulation** |
 | Physical actuation on a modified FDM gantry (GRBL/Marlin) | **Integration in progress** |
+
+## Limitations
+
+- Legibility is below the real-specimen ceiling (top-1 0.425 against 0.533). Neural generators trained on large corpora may score higher on their benchmark datasets.
+- One specimen bank models one writer. A new writer requires a new calibration form.
+- Stroke order follows the skeleton from left to right, not the writer's true pen direction.
+- Specimens must be written with the same instrument as the intended output (pencil and ballpoint differ).
 
 ## Scope and responsible use
 
